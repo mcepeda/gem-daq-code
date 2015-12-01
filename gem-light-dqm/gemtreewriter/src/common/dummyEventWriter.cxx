@@ -36,7 +36,7 @@ int main(int argc, char** argv)
                 std::cout << "Channel filling:     --r --> fill with randoms "<<std::endl; 
                 std::cout << "                     --p patternLS pattern MS ---> fill with a pattern fixing the channels on for LS and MS "<<std::endl;
                 std::cout << "                                             ---> example '--p 11110000011111   1011111100001' "<<std::endl;
-                std::cout << "                                             ---> note reversed order: "1" == 1st channel on, "100" == 1st channel on, then 2 off (to be fixed?)."<<std::endl; 
+                std::cout << "                                             ---> note reversed order: '1' == 1st channel on, '100' == 1st channel on, then 2 off (to be fixed?)."<<std::endl; 
                 std::cout << "                     --f channelsON --> fill X channels. example: '--f  0xffffff' "<<std::endl;   
                 std::cout << "(If no options inserted, all channels filled '--f 64')"<<std::endl; 
                 return 0;
