@@ -35,7 +35,8 @@ int main(int argc, char** argv)
                 std::cout << "                     --c NumberOfChambers (default=4) " << std::endl;
                 std::cout << "Channel filling:     --r --> fill with randoms "<<std::endl; 
                 std::cout << "                     --p patternLS pattern MS ---> fill with a pattern fixing the channels on for LS and MS "<<std::endl;
-                std::cout << "                                             ---> example '--p 11110000011111   101111110000' "<<std::endl;
+                std::cout << "                                             ---> example '--p 11110000011111   1011111100001' "<<std::endl;
+                std::cout << "                                             ---> note reversed order: "1" == 1st channel on, "100" == 1st channel on, then 2 off (to be fixed?)."<<std::endl; 
                 std::cout << "                     --f channelsON --> fill X channels. example: '--f  0xffffff' "<<std::endl;   
                 std::cout << "(If no options inserted, all channels filled '--f 64')"<<std::endl; 
                 return 0;
@@ -220,7 +221,7 @@ void WriteVFAT(int ev,uint16_t ChipID,uint16_t sn, uint64_t  lsData, uint64_t  m
         outf << std::hex << BXfrOH << std::dec << std::endl;
         outf << std::hex << CRC << std::dec << std::endl;
 
-        if(checkBlock(b1010,b1100,b1110,sn,CRC,CRC)!=1)std::cout<<checkBlock(b1010,b1100,b1110,sn,CRC,CRC)<<std::endl;
+        //if(checkBlock(b1010,b1100,b1110,sn,CRC,CRC)!=1)std::cout<<checkBlock(b1010,b1100,b1110,sn,CRC,CRC)<<std::endl;
 
 
         return;
