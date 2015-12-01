@@ -31,11 +31,12 @@ int main(int argc, char** argv)
         {
                 std::cout << "Please provide input and output filenames" << std::endl;
                 std::cout << "Usage: <path>/dummyEventWriter outputFile.dat  slot_config.csv [--n events] [--r] [--f channelsON] [--p patternLS patternMS]" << std::endl;
-                std::cout << "Parameters:  --n NumberOfEvents (default=100) " << std::endl;
-                std::cout << "             --r --> fill with randoms "<<std::endl; 
-                std::cout << "             --p patternLS pattern MS ---> fill with a pattern fixing the channels on for LS and MS "<<std::endl;
-                std::cout << "                                      ---> example '--p 11110000011111   101111110000' "<<std::endl;
-                std::cout << "             --f channelsON --> fill X channels. example: '--f  0xffffff' "<<std::endl;   
+                std::cout << "General Parameters:  --n NumberOfEvents (default=100) " << std::endl;
+                std::cout << "                     --c NumberOfChambers (default=4) " << std::endl;
+                std::cout << "Channel filling:     --r --> fill with randoms "<<std::endl; 
+                std::cout << "                     --p patternLS pattern MS ---> fill with a pattern fixing the channels on for LS and MS "<<std::endl;
+                std::cout << "                                             ---> example '--p 11110000011111   101111110000' "<<std::endl;
+                std::cout << "                     --f channelsON --> fill X channels. example: '--f  0xffffff' "<<std::endl;   
                 std::cout << "(If no options inserted, all channels filled '--f 64')"<<std::endl; 
                 return 0;
         }
@@ -46,14 +47,19 @@ int main(int argc, char** argv)
         int channelsON=64;
         bool fillRandom=false;
         bool fillPattern=false;
+        int NChambers=4;
         std::string patternLS="0";
         std::string patternMS="0";
         for(int i=3; i<argc; i++){
                 if(argv[i]==std::string("--n")) events = std::stoi(argv[i+1]);
+                if(argv[i]==std::string("--c")) NChambers = std::stoi(argv[i+1]);
                 if(argv[i]==std::string("--f")) channelsON = std::stoi(argv[i+1]);
                 if(argv[i]==std::string("--r")) fillRandom =true;
                 if(argv[i]==std::string("--p")) {fillPattern=true; patternLS=argv[i+1];  patternMS=argv[i+2];}
         }
+        std::cout<<"Running DummyEventWriter - for debugging purposes"<<std::endl;
+        std::cout<<"I will create "<<events<<" in "<<NChambers<<" chambers"<<std::endl;
+ 
 
         if(fillRandom) std::cout<<"Filling with randoms"<<std::endl;
         else if(fillPattern){
@@ -116,7 +122,7 @@ int main(int argc, char** argv)
                 std::unique_ptr<gem::readout::GEMslotContents> slotInfo_ = std::unique_ptr<gem::readout::GEMslotContents> (new gem::readout::GEMslotContents(slot_file));
                 uint32_t sumVFAT=slotInfo_->GEBNumberOfSlots(); // this assumes all the chambers are going to have the same slots filled. 
 
-                for (int chamber=0; chamber<1; chamber++){
+                for (int chamber=0; chamber<NChambers; chamber++){
 
                         uint64_t ChamID = 3562-chamber;
                         uint64_t GEBheader=sumVFAT + (ChamID<<28) + (ZSFlag<<40);
