@@ -114,6 +114,7 @@ class gemTreeReader {
     std::string maps[NVFAT];
     std::map<int, GEMStripCollection> allstrips;
 
+    TH1F* hiChamberID                [3]; // Number of Chambers ON
     TH1F* hiVFAT                     [3]; // Number of VFATs in event
     TH1F* hiVFATsn                   [3]; // VFAT slot number distribution
     TH1I* hiChip                     [3]; // VFAT ChipID distribution
@@ -159,6 +160,7 @@ class gemTreeReader {
         dir[i] = ofile->mkdir(dirname[i].c_str());
         if (DEBUG) std::cout << std::dec << "[gemTreeReader]: Directory " << i+1 << " created" << std::endl;   
         dir[i]->cd();
+        hiChamberID     [i] = new TH1F((dirname[i]+"_ChamberID").c_str(), "ChamberID", 100,  3500, 3600. );  // axis to be fixed
         hiVFAT         [i] = new TH1F((dirname[i]+"_VFAT").c_str(), "Number VFAT blocks per event", 24,  0., 24. );
         hiVFATsn       [i] = new TH1F((dirname[i]+"_VFATsn").c_str(), "VFAT slot number", 24,  0., 24. );
         hiDiffBXandBC  [i] = new TH1I((dirname[i]+"_DiffBXandBC").c_str(), "Difference of BX and BC", 100000, 0x0, 0x1869F );
@@ -245,9 +247,11 @@ class gemTreeReader {
         // create vector of GEBdata. For data format details look at Event.h
         vector<GEBdata> v_geb;
         v_geb = event->gebs();
+
         // loop over gebs
         for (Int_t j = 0; j < v_geb.size(); j++)
-        {
+        { 
+          uint32_t chamID=event->gebs().at(j).ChamID();
           // create vector of VFATdata. For data format details look at Event.h
           vector<VFATdata> v_vfat;
           v_vfat = v_geb.at(j).vfats();
@@ -270,6 +274,7 @@ class gemTreeReader {
             // fill histograms for all events
             dir[0]->cd();
             this->fillVFATHistograms(&v_vfat.at(k), hiVFATsn[0], hiCh128[0], hiCh_notfired[0], hiChip[0], hi1010[0], hi1100[0], hi1110[0], hiFlag[0], hiCRC[0], hiDiffCRC[0], hi2DCRC[0], hi2DCRCperVFAT[0], hiCh128chipFired[0], hiStripsFired[0], hiBeamProfile[0], firedchannels[0], notfiredchannels[0]);
+            hiChamberID[0]->Fill(chamID);
             if (v_vfat.at(k).isBlockGood()){
               nGoodVFAT[0]++;
             }else {
@@ -283,15 +288,17 @@ class gemTreeReader {
                 nBadVFAT[1]++;
               }
               dir[1]->cd();
-              this->fillVFATHistograms(&v_vfat.at(k), hiVFATsn[1], hiCh128[1], hiCh_notfired[1], hiChip[1], hi1010[1], hi1100[1], hi1110[1], hiFlag[1], hiCRC[1], hiDiffCRC[1], hi2DCRC[1], hi2DCRCperVFAT[1], hiCh128chipFired[1], hiStripsFired[1], hiBeamProfile[1], firedchannels[1], notfiredchannels[1]);
+              hiChamberID[1]->Fill(chamID);
+              this->fillVFATHistograms(&v_vfat.at(k), hiVFATsn[1], hiCh128[1], hiCh_notfired[1], hiChip[1],  hi1010[1], hi1100[1], hi1110[1], hiFlag[1], hiCRC[1], hiDiffCRC[1], hi2DCRC[1], hi2DCRCperVFAT[1], hiCh128chipFired[1], hiStripsFired[1], hiBeamProfile[1], firedchannels[1], notfiredchannels[1]);
             } else {
               if (v_vfat.at(k).isBlockGood()){
                 nGoodVFAT[2]++;
               }else {
                 nBadVFAT[2]++;
               }
-              dir[2]->cd();
-              this->fillVFATHistograms(&v_vfat.at(k), hiVFATsn[2], hiCh128[2], hiCh_notfired[2], hiChip[2], hi1010[2], hi1100[2], hi1110[2], hiFlag[2], hiCRC[2], hiDiffCRC[2], hi2DCRC[2], hi2DCRCperVFAT[2], hiCh128chipFired[2], hiStripsFired[2], hiBeamProfile[2], firedchannels[2], notfiredchannels[2]);
+              dir[2]->cd();  
+              hiChamberID[2]->Fill(chamID);
+              this->fillVFATHistograms(&v_vfat.at(k), hiVFATsn[2], hiCh128[2], hiCh_notfired[2], hiChip[2],  hi1010[2], hi1100[2], hi1110[2], hiFlag[2], hiCRC[2], hiDiffCRC[2], hi2DCRC[2], hi2DCRCperVFAT[2], hiCh128chipFired[2], hiStripsFired[2], hiBeamProfile[2], firedchannels[2], notfiredchannels[2]);
             }// end if eventIsOK
             BC = v_vfat.at(k).BC();
           }// end of loop over VFATs
@@ -335,7 +342,7 @@ class gemTreeReader {
       }
     }
 
-  void fillVFATHistograms(VFATdata *m_vfat, TH1F* m_hiVFATsn, TH1F* m_hiCh128, TH1F* m_hiCh_notfired, TH1I* m_hiChip, TH1I* m_hi1010, TH1I* m_hi1100, 
+  void fillVFATHistograms(VFATdata *m_vfat, TH1F* m_hiVFATsn, TH1F* m_hiCh128, TH1F* m_hiCh_notfired, TH1I* m_hiChip,  TH1I* m_hi1010, TH1I* m_hi1100, 
 			  TH1I* m_hi1110, TH1I* m_hiFlag, TH1I* m_hiCRC, TH1I* m_hiDiffCRC, TH2I* m_hi2DCRC, TH2I* m_hi2DCRCperVFAT[], 
 	                  TH1F* m_hiCh128chipFired[], TH1F* m_hiStripsFired[], TH2I* m_hiBeamProfile, int & firedchannels, 
 			  int & notfiredchannels)
